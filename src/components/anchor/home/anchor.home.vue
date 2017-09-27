@@ -1,10 +1,17 @@
 <!--个人主页-->
 <template>
-<div class="anchor-home">
-    <div class="anchor-content">
+<div class="anchor-home" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
+    <div class="anchor-content" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
         <img class="anchor-img" :src="userInfo.avatar">
-        <p class="anchor-name">{{userInfo.nickname}}</p>
+        <p class="anchor-name">
+            <span class="nickname">{{userInfo.nickname}}</span>
+            <span class="sex-male" v-if="userInfo.sex == 1"><i class="icon gjb-male"></i>男</span>
+            <span class="sex-female" v-else><i class="icon gjb-female"></i>女</span>
+        </p>
         <p class="anchor-id">ID:{{userInfo.accid}}</p>
+        <!--<audio :src="audioUrl" controls="controls">
+            您的浏览器不支持 audio 标签。
+        </audio>-->
         <div class="anchor-count">
             <div>
                 <p class="count">{{!!userInfo.fans ? userInfo.fans : 0}}</p>
@@ -31,8 +38,8 @@
             <div class="info-box">
                 <div>
                     <span>性别：</span>
-                    <span v-if="userInfo.sex == 1"><i class="icon gjb-male"></i>男</span>
-                    <span v-else><i class="icon gjb-female"></i>女</span>
+                    <span class="sex-male" v-if="userInfo.sex == 1"><i class="icon gjb-male"></i>男</span>
+                    <span class="sex-female" v-else><i class="icon gjb-female"></i>女</span>
                 </div>
                 <div>
                     <span>年龄：</span>
@@ -40,7 +47,7 @@
                 </div>
                 <div>
                     <span>职业：</span>
-                    <span>{{userInfo.job}}</span>
+                    <span class="job">{{userInfo.job}}</span>
                 </div>
                 <div>
                     <span>现居地：</span>
@@ -76,8 +83,8 @@
         </div>
         <div class="msg-comment-box">
             <div class="comment-intro">
-                <p><i class="icon gjb-prise"></i>{{dynamic.zanTotal}}</p>
-                <p><i class="icon gjb-comment"></i>  {{dynamic.commentTotal}}</p>
+                <p><i class="icon gjb-prise icon-blue"></i>{{dynamic.zanTotal}}</p>
+                <p><i class="icon gjb-comment icon-blue"></i>  {{dynamic.commentTotal}}</p>
             </div>
 
             <div class="comment-detail" v-for="comment in commentList">
@@ -85,12 +92,12 @@
               <div class="comment-text">
                 <div class="comment-user-info">
                   <div>
-                    <span>{{comment.nickname}}</span>
-                    <span v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
-                    <span v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
-                    <span>{{comment.job}}</span>
+                    <span class="nickname">{{comment.nickname}}</span>
+                    <span class="sex-female" v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
+                    <span class="sex-male" v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
+                    <span class="job">{{comment.job}}</span>
                   </div>
-                  <p><i class="icon gjb-prise"></i> {{comment.zan_num}}</p>
+                  <p><i class="icon gjb-prise icon-blue"></i> {{comment.zan_num}}</p>
                 </div>
                 <div>{{new Date(parseInt(comment.create_time) * 1000).pattern('yyyy-MM-dd hh:mm:ss')}}</div>
                 <div class="comment-info">{{comment.content}}</div>
@@ -150,7 +157,8 @@ export default {
                 zan: '',
                 zanTotal: ''
             },
-            commentList: []
+            commentList: [],
+            audioUrl: ''
         };
     },
     created() {
@@ -174,6 +182,7 @@ export default {
             if (res.status == 0) {
               self.userInfo = res.data.userinfo;
               self.dynamic = res.data.dynamic;
+              self.audioUrl = res.data.cast.sound;
               self.getComments(self.dynamic.id);
             } else {
               Toast({
@@ -223,9 +232,50 @@ export default {
 
 <style lang="less">
 .anchor-home {
+    height: 100%;
+    &.isfemale {
+         background: #e894bf!important;
+     }
+    &.ismale {
+        background: #a8cafd!important;
+     }
+    .sex-female {
+        font-size: 1.4rem;
+        color: #fff;
+        background: #FF69B4;
+        padding: .2rem;
+        border-radius: 5px;
+    }
+    .sex-male {
+        font-size: 1.4rem;
+        color: #fff;
+        background: #1b73b8;
+        padding: .2rem;
+        border-radius: 5px;
+    }
+    .job {
+        background: #71a047;
+        color: #fff;
+        padding: .2rem;
+        border-radius: 5px;
+        font-size: 1.4rem;
+    }
+    .nickname {
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .icon-blue {
+        color: #3184cc;
+    }
     .anchor-content {
         background: #ffffff;
         padding: 3rem;
+        &.isfemale {
+             background: #e894bf!important;
+         }
+        &.ismale {
+             background: #a8cafd!important;
+         }
         .anchor-img {
             width: 10rem;
             height: 10rem;
@@ -246,6 +296,7 @@ export default {
             margin-top: 2rem;
             .count {
                 font-weight: bold;
+                font-size: 2rem;
             }
         }
     }
@@ -256,6 +307,7 @@ export default {
         padding: 1rem 3rem;
         margin-top: 1rem;
         line-height: 2rem;
+        border-radius: 2rem;
         .info-title {
             font-size: 1.6rem;
             color: #000000;
@@ -296,6 +348,7 @@ export default {
         padding: 1rem 3rem;
         text-align: left;
         font-size: 1.6rem;
+        border-radius: 2rem;
         .msg-text {
             margin-bottom: 1rem;
             line-height: 2rem;
@@ -307,7 +360,8 @@ export default {
         }
         .msg-video {
             video {
-              width: 100%;
+                width: 100%;
+                height: 16rem;
             }
         }
         .msg-comment-box {
@@ -350,6 +404,7 @@ export default {
         padding: 4rem 3rem;
         display: flex;
         justify-content: space-around;
+        border-radius: 2rem;
         .logo-img {
             width: 14rem;
             height: 14rem;

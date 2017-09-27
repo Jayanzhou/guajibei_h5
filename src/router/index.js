@@ -9,15 +9,26 @@ import PageNotFund from '@/components/error/page.not.fund';
 Vue.use(Router)
 
 export default new Router({
-    mode: 'history',
+    mode: 'hash',
+    base: '/share/',
     routes: [
-        {
+        /*{
             path: '/',
             name: 'Hello',
             component: Hello
+        },*/
+        {
+            path: "/gerenxiu",
+            name: "AnchorHome",
+            component: AnchorHome
         },
         {
-            path: "/share",
+            path: "/dongtai",
+            name: "ProductDetail",
+            component: ProductDetail
+        }
+        /*{
+            path: "/",
             component: AnchorMain,
             children: [
                 {
@@ -31,7 +42,7 @@ export default new Router({
                     component: ProductDetail
                 }
           ]
-        },
+        }*/,
         {
             path: "*",
             component: PageNotFund

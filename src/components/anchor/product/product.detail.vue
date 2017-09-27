@@ -1,14 +1,14 @@
 <!--作品详情页面-->
 <template>
-<div class="product-detail">
-    <div class="anchor-info">
+<div class="product-detail" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
+    <div class="anchor-info" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
         <img :src="userInfo.avatar">
         <div class="anchor-intro">
             <div>
-                <span>{{userInfo.nickname}}</span>
-                <span v-if="userInfo.sex == 2"><i class="icon gjb-female">{{userInfo.age}}</i></span>
-                <span v-else><i class="icon gjb-male">{{userInfo.age}}</i></span>
-                <span>{{userInfo.job}}</span>
+                <span class="nickname">{{userInfo.nickname}}</span>
+                <span class="sex-female" v-if="userInfo.sex == 2"><i class="icon gjb-female">{{userInfo.age}}</i></span>
+                <span class="sex-male" v-else><i class="icon gjb-male">{{userInfo.age}}</i></span>
+                <span class="job">{{userInfo.job}}</span>
             </div>
             <p>{{updateTime}}</p>
         </div>
@@ -32,13 +32,13 @@
         <div class="msg-comment-box">
             <div class="comment-intro">
                 <div>
-                    <i class="icon gjb-prise"></i>
+                    <i class="icon gjb-prise icon-blue"></i>
                     <span class="prise-count">{{detail.zan_num}}</span>
                     <template v-for="user in detail.zan_user">
                         <img class="prise-img" :src="user.avatar">
                     </template>
                 </div>
-                <p><i class="icon gjb-comment"></i>  {{detail.comment_amount}}</p>
+                <p><i class="icon gjb-comment icon-blue"></i>  {{detail.comment_amount}}</p>
             </div>
 
             <div class="comment-detail" v-for="comment in commentList">
@@ -46,12 +46,12 @@
                 <div class="comment-text">
                     <div class="comment-user-info">
                         <div>
-                            <span>{{comment.nickname}}</span>
-                            <span v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
-                            <span v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
-                            <span>{{comment.job}}</span>
+                            <span class="nickname">{{comment.nickname}}</span>
+                            <span class="sex-female" v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
+                            <span class="sex-male" v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
+                            <span class="job">{{comment.job}}</span>
                         </div>
-                        <p><i class="icon gjb-prise"></i> {{comment.zan_num}}</p>
+                        <p><i class="icon gjb-prise icon-blue"></i> {{comment.zan_num}}</p>
                     </div>
                     <div>{{new Date(parseInt(comment.create_time) * 1000).pattern('yyyy-MM-dd hh:mm:ss')}}</div>
                     <div class="comment-info">{{comment.content}}</div>
@@ -214,12 +214,53 @@ export default {
 </script>
 <style lang="less">
 .product-detail {
+    height: 100%;
+    &.isfemale {
+         background: #e894bf!important;
+     }
+    &.ismale {
+         background: #a8cafd!important;
+     }
+    .sex-female {
+        font-size: 1.4rem;
+        color: #fff;
+        background: #FF69B4;
+        padding: .2rem;
+        border-radius: 5px;
+    }
+    .sex-male {
+        font-size: 1.4rem;
+        color: #fff;
+        background: #1b73b8;
+        padding: .2rem;
+        border-radius: 5px;
+    }
+    .job {
+        background: #71a047;
+        color: #fff;
+        padding: .2rem;
+        border-radius: 5px;
+        font-size: 1.4rem;
+    }
+    .nickname {
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .icon-blue {
+        color: #3184cc;
+    }
     .anchor-info {
         background: #ffffff;
         padding: 2rem 3rem 1rem 3rem;
         text-align: left;
         font-size: 1.6rem;
         display: flex;
+        &.isfemale {
+             background: #e894bf!important;
+         }
+        &.ismale {
+             background: #a8cafd!important;
+         }
         img {
             width: 10rem;
             height: 10rem;
@@ -255,6 +296,7 @@ export default {
         .msg-video {
             video {
                 width: 100%;
+                height: 16rem;
             }
         }
         .msg-comment-box {
