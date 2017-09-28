@@ -9,12 +9,15 @@
             您的浏览器不支持 audio 标签。
           </audio>
         </div>
-        <img class="anchor-img" :src="userInfo.avatar">
-        <div class="audio-msg">
-          <!--<i class="icon gjb-audio-high"></i>-->
-          <audio id="audio_intro" :src="audioUrl" preload="auto" hidden="true">
-            您的浏览器不支持 audio 标签。
-          </audio>
+        <div class="anchor-img">
+            <img :src="userInfo.avatar">
+            <!--<div class="audio-msg">
+              <i class="icon gjb-voice"></i>
+              <span class="yuyin-box"><i class="icon gjb-yuyin"></i></span>
+              <audio id="audio_intro" :src="audioUrl" preload="auto" hidden="true">
+                您的浏览器不支持 audio 标签。
+              </audio>
+            </div>-->
         </div>
 
         <p class="anchor-name">
@@ -93,9 +96,19 @@
             </template>
         </div>
         <div class="msg-comment-box">
-            <div class="comment-intro">
+            <!--<div class="comment-intro">
                 <p><i class="icon gjb-prise icon-blue"></i>{{dynamic.zanTotal}}</p>
                 <p><i class="icon gjb-comment icon-blue"></i>  {{dynamic.commentTotal}}</p>
+            </div>-->
+            <div class="comment-intro">
+              <div>
+                <i class="icon gjb-prise icon-blue"></i>
+                <span class="prise-count">{{detail.zan_num}}</span>
+                <template v-for="user in detail.zan_user">
+                  <img class="prise-img" :src="user.avatar">
+                </template>
+              </div>
+              <p><i class="icon gjb-comment icon-blue"></i>  {{detail.comment_amount}}</p>
             </div>
 
             <div class="comment-detail" v-for="comment in commentList">
@@ -103,7 +116,7 @@
               <div class="comment-text">
                 <div class="comment-user-info">
                   <div>
-                    <span class="nickname">{{comment.nickname}}</span>
+                    <span class="nickname-comm">{{comment.nickname}}</span>
                     <span class="sex-female" v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
                     <span class="sex-male" v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
                     <span class="job">{{comment.job}}</span>
@@ -168,6 +181,18 @@ export default {
                 zan: '',
                 zanTotal: ''
             },
+            detail: {
+              comment_amount: '',
+              content: '',
+              create_time: '',
+              id: '',
+              picture: [],
+              type: '',
+              update_time: '',
+              video: '',
+              zan_num: '',
+              zan_user: []
+            },
             commentList: [],
             audioUrl: '',
             bgMusicPlay: true
@@ -202,7 +227,10 @@ export default {
               self.userInfo = res.data.userinfo;
               self.dynamic = res.data.dynamic;
               self.audioUrl = res.data.cast.sound;
-              self.getComments(self.dynamic.id);
+              if (!!self.dynamic) {
+                self.getDynamicDetail(self.dynamic.id);
+                self.getComments(self.dynamic.id);
+              }
             } else {
               Toast({
                 message: res.message || '网络超时，请重试',
@@ -216,6 +244,34 @@ export default {
             });
           }).always(() => Indicator.close());
         },
+        getDynamicDetail(dynamic_id) {
+          Indicator.open({
+            text: '加载中...',
+            spinnerType: 'fading-circle'
+          });
+          let self = this;
+          $.ajax({
+            url: "http://guajibei.9fhl.cn/app_service/dynamic/getdynamicdetail",
+            method: "POST",
+            data: {
+              dynamic_id: dynamic_id
+            }
+          }).done(res => {
+            if (res.status == 0) {
+              self.detail = res.data.detail;
+            } else {
+              Toast({
+                message: res.message || '网络超时，请重试',
+                duration: 3000
+              });
+            }
+          }).fail(err => {
+            Toast({
+              message: err.message || '网络超时，请重试',
+              duration: 3000
+            });
+          }).always(() => Indicator.close());
+      },
         getComments(dynamic_id) {
           Indicator.open({
             text: '加载中...',
@@ -232,11 +288,6 @@ export default {
           }).done(res => {
             if (res.status == 0) {
               self.commentList = res.data;
-            } else {
-              Toast({
-                message: res.message || '网络超时，请重试',
-                duration: 3000
-              });
             }
           }).fail(err => {
             Toast({
@@ -291,7 +342,7 @@ export default {
     }
     .nickname {
         font-size: 2rem;
-        font-weight: 600;
+        font-weight: 800;
     }
     .icon-blue {
         color: #3184cc;
@@ -308,6 +359,7 @@ export default {
           color: #77a4dc;
         }
     }
+
     .anchor-content {
         background: #ffffff;
         padding: 3rem;
@@ -321,9 +373,17 @@ export default {
              background: #a8cafd!important;
          }
         .anchor-img {
-            width: 10rem;
-            height: 10rem;
-            border-radius: 50%;
+            position: relative;
+            .audio-msg {
+              /*position: absolute;
+              right: 3rem;
+              top: 0;*/
+            }
+            img {
+              width: 10rem;
+              height: 10rem;
+              border-radius: 50%;
+            }
         }
         .anchor-name {
             font-size: 2rem;
@@ -375,8 +435,10 @@ export default {
             line-height: 2rem;
         }
         .msg-img {
+            text-align: center;
             img {
-                width: 10rem;
+                width: 14rem;
+                padding: .2rem .2rem
             }
         }
         .msg-video {
@@ -386,11 +448,31 @@ export default {
             }
         }
         .msg-comment-box {
-            .comment-intro {
-                display: flex;
-                justify-content: space-between;
-                margin: 1rem 0;
+          .nickname-comm {
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+          .comment-intro {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            align-items: center;
+            .prise-img {
+              width: 3rem;
+              height: 3rem;
+              border-radius: 50%;
             }
+            i {
+              display: inline-block;
+            }
+            div {
+              display: flex;
+              align-items: center;
+              .prise-count {
+                margin-right: .5rem;
+              }
+            }
+          }
             .comment-detail {
                 padding: .5rem 0;
                 display: flex;
@@ -413,7 +495,7 @@ export default {
                         }
                     }
                     .comment-info {
-                        font-size: 1.6rem;
+                        font-size: 1.4rem;
                     }
                 }
             }

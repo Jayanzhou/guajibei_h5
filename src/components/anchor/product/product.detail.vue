@@ -53,7 +53,7 @@
                 <div class="comment-text">
                     <div class="comment-user-info">
                         <div>
-                            <span class="nickname">{{comment.nickname}}</span>
+                            <span class="nickname-comm">{{comment.nickname}}</span>
                             <span class="sex-female" v-if="comment.sex == 2"><i class="icon gjb-female"></i>{{comment.age}}</span>
                             <span class="sex-male" v-else><i class="icon gjb-male"></i>{{comment.age}}</span>
                             <span class="job">{{comment.job}}</span>
@@ -67,6 +67,12 @@
 
         </div>
     </div>
+
+    <div class="logo">
+      <img class="logo-img" src="../../../assets/logo.png">
+      <img class="logo-img" src="http://www.9fhl.cn/share/qr_code.png">
+    </div>
+
 </div>
 </template>
 
@@ -211,11 +217,6 @@ export default {
           }).done(res => {
             if (res.status == 0) {
               self.commentList = res.data;
-            } else {
-              Toast({
-                message: res.message || '网络超时，请重试',
-                duration: 3000
-              });
             }
           }).fail(err => {
             Toast({
@@ -269,7 +270,7 @@ export default {
     }
     .nickname {
         font-size: 2rem;
-        font-weight: 600;
+        font-weight: 800;
     }
     .icon-blue {
         color: #3184cc;
@@ -332,14 +333,17 @@ export default {
         padding: 1rem 3rem;
         text-align: left;
         font-size: 1.6rem;
+        box-shadow: 10px 10px 5px #888888;
         .msg-text {
             margin-bottom: 1rem;
             line-height: 2rem;
         }
         .msg-img {
-            img {
-                width: 10rem;
-            }
+          text-align: center;
+          img {
+            width: 14rem;
+            padding: .2rem .2rem
+          }
         }
         .msg-video {
             video {
@@ -348,6 +352,10 @@ export default {
             }
         }
         .msg-comment-box {
+            .nickname-comm {
+              font-size: 1.5rem;
+              font-weight: 700;
+            }
             .comment-intro {
                 display: flex;
                 justify-content: space-between;
@@ -391,11 +399,24 @@ export default {
                         }
                     }
                     .comment-info {
-                        font-size: 1.6rem;
+                        font-size: 1.4rem;
                     }
                 }
             }
         }
+    }
+
+    .logo {
+      margin-top: 2rem;
+      margin-bottom: 5rem;
+      background: #ffffff;
+      padding: 3rem 2rem;
+      display: flex;
+      justify-content: space-around;
+      .logo-img {
+        width: 10rem;
+        height: 10rem;
+      }
     }
 }
 
