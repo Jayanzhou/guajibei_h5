@@ -1,17 +1,28 @@
 <!--个人主页-->
 <template>
-<div class="anchor-home" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
+  <!--:class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}"-->
+<div class="anchor-home" >
     <div class="anchor-content" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
+        <div class="bg-music">
+          <span :class="{'music-box': bgMusicPlay}" @click="bgMusicBtnClick"><i class="icon gjb-music"></i></span>
+          <audio id="audio_bg" src="http://www.9fhl.cn/share/bg_music.mp3" autoplay loop hidden="true">
+            您的浏览器不支持 audio 标签。
+          </audio>
+        </div>
         <img class="anchor-img" :src="userInfo.avatar">
+        <div class="audio-msg">
+          <!--<i class="icon gjb-audio-high"></i>-->
+          <audio id="audio_intro" :src="audioUrl" preload="auto" hidden="true">
+            您的浏览器不支持 audio 标签。
+          </audio>
+        </div>
+
         <p class="anchor-name">
             <span class="nickname">{{userInfo.nickname}}</span>
             <span class="sex-male" v-if="userInfo.sex == 1"><i class="icon gjb-male"></i>男</span>
             <span class="sex-female" v-else><i class="icon gjb-female"></i>女</span>
         </p>
         <p class="anchor-id">ID:{{userInfo.accid}}</p>
-        <!--<audio :src="audioUrl" controls="controls">
-            您的浏览器不支持 audio 标签。
-        </audio>-->
         <div class="anchor-count">
             <div>
                 <p class="count">{{!!userInfo.fans ? userInfo.fans : 0}}</p>
@@ -113,7 +124,7 @@
 
     <div class="logo">
         <img class="logo-img" src="../../../assets/logo.png">
-        <img class="logo-img" src="../../../assets/qr_code.png">
+        <img class="logo-img" src="http://www.9fhl.cn/share/qr_code.png">
     </div>
 
 </div>
@@ -158,11 +169,19 @@ export default {
                 zanTotal: ''
             },
             commentList: [],
-            audioUrl: ''
+            audioUrl: '',
+            bgMusicPlay: true
         };
     },
     created() {
         this.getHomepage();
+    },
+    mounted() {
+        const audioBg = document.getElementById('audio_bg');
+        const self = this;
+        audioBg.addEventListener('ended', () => {
+          self.bgMusicPlay = true;
+        });
     },
     methods: {
         getHomepage() {
@@ -225,6 +244,16 @@ export default {
               duration: 3000
             });
           }).always(() => Indicator.close());
+        },
+        bgMusicBtnClick(event) {
+            const audioBg = document.getElementById('audio_bg');
+            if(audioBg.paused) {
+              audioBg.play();
+              this.bgMusicPlay = true;
+            }else{
+              audioBg.pause();
+              this.bgMusicPlay = false;
+            }
         }
     }
 }
@@ -240,14 +269,14 @@ export default {
         background: #a8cafd!important;
      }
     .sex-female {
-        font-size: 1.4rem;
+        font-size: 1.4rem!important;
         color: #fff;
         background: #FF69B4;
         padding: .2rem;
         border-radius: 5px;
     }
     .sex-male {
-        font-size: 1.4rem;
+        font-size: 1.4rem!important;
         color: #fff;
         background: #1b73b8;
         padding: .2rem;
@@ -267,9 +296,24 @@ export default {
     .icon-blue {
         color: #3184cc;
     }
+    .bg-music {
+        position: absolute;
+        .music-box {
+          transform-origin: 50% 50%;
+          animation: bgmusic 1s infinite linear;
+          display: inline-block;
+        }
+        i {
+          font-size: 4rem;
+          color: #77a4dc;
+        }
+    }
     .anchor-content {
         background: #ffffff;
         padding: 3rem;
+        margin-bottom: 2rem;
+        position: relative;
+        box-shadow: 10px 10px 5px #888888;
         &.isfemale {
              background: #e894bf!important;
          }
@@ -301,13 +345,13 @@ export default {
         }
     }
     .anchor-info {
-        margin-top: 1rem;
+        margin-bottom: 2rem;
         text-align: left;
         background: #ffffff;
         padding: 1rem 3rem;
         margin-top: 1rem;
         line-height: 2rem;
-        border-radius: 2rem;
+        box-shadow: 10px 10px 5px #888888;
         .info-title {
             font-size: 1.6rem;
             color: #000000;
@@ -319,36 +363,13 @@ export default {
             }
         }
     }
-    .best-comment {
-        text-align: left;
-        margin-top: 1rem;
-        background: #ffffff;
-        padding: 1rem 3rem;
-        .comment-title {
-            font-size: 1.6rem;
-            color: #000000;
-        }
-        .comment-detail {
-            padding: .5rem 0;
-            display: flex;
-            font-size: 1.4rem;
-            .best-comment-img {
-                width: 5rem;
-                height: 5rem;
-            }
-            .comment-text {
-                flex: 1;
-                padding-left: 1rem;
-            }
-        }
-    }
     .dynamic-box {
         background: #ffffff;
-        margin-top: 1rem;
+        margin-bottom: 2rem;
         padding: 1rem 3rem;
         text-align: left;
         font-size: 1.6rem;
-        border-radius: 2rem;
+        box-shadow: 10px 10px 5px #888888;
         .msg-text {
             margin-bottom: 1rem;
             line-height: 2rem;
@@ -399,17 +420,25 @@ export default {
         }
     }
     .logo {
-        margin-top: 1rem;
+        margin-bottom: 5rem;
         background: #ffffff;
-        padding: 4rem 3rem;
+        padding: 3rem 2rem;
         display: flex;
         justify-content: space-around;
-        border-radius: 2rem;
         .logo-img {
-            width: 14rem;
-            height: 14rem;
+            width: 10rem;
+            height: 10rem;
         }
     }
+
+  @keyframes bgmusic {
+    from{
+      transform: rotate(0deg);
+    }
+    to{
+      transform: rotate(360deg);
+    }
+  }
 
 }
 </style>

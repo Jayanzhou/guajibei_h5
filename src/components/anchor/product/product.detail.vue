@@ -1,6 +1,7 @@
 <!--作品详情页面-->
 <template>
-<div class="product-detail" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
+  <!--:class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}"-->
+<div class="product-detail" >
     <div class="anchor-info" :class="{isfemale: userInfo.sex == 2, ismale: userInfo.sex == 1}">
         <img :src="userInfo.avatar">
         <div class="anchor-intro">
@@ -11,6 +12,12 @@
                 <span class="job">{{userInfo.job}}</span>
             </div>
             <p>{{updateTime}}</p>
+        </div>
+        <div class="bg-music">
+          <span :class="{'music-box': bgMusicPlay}" @click="bgMusicBtnClick"><i class="icon gjb-music"></i></span>
+          <audio id="audio_bg" src="http://www.9fhl.cn/share/bg_music.mp3" autoplay loop hidden="true">
+            您的浏览器不支持 audio 标签。
+          </audio>
         </div>
     </div>
     <div class="dynamic-box">
@@ -102,13 +109,21 @@ export default {
               zan: ""
             },
             page: 1,
-            commentList: []
+            commentList: [],
+            bgMusicPlay: true
         };
     },
     created() {
         this.getUserInfo();
         this.getDynamicDetail();
         this.getComments();
+    },
+    mounted() {
+      const audioBg = document.getElementById('audio_bg');
+      const self = this;
+      audioBg.addEventListener('ended', () => {
+        self.bgMusicPlay = true;
+      });
     },
     computed: {
         updateTime() {
@@ -208,6 +223,16 @@ export default {
               duration: 3000
             });
           }).always(() => Indicator.close());
+        },
+        bgMusicBtnClick(event) {
+          const audioBg = document.getElementById('audio_bg');
+          if(audioBg.paused) {
+            audioBg.play();
+            this.bgMusicPlay = true;
+          }else{
+            audioBg.pause();
+            this.bgMusicPlay = false;
+          }
         }
     }
 }
@@ -222,14 +247,14 @@ export default {
          background: #a8cafd!important;
      }
     .sex-female {
-        font-size: 1.4rem;
+        font-size: 1.4rem!important;
         color: #fff;
         background: #FF69B4;
         padding: .2rem;
         border-radius: 5px;
     }
     .sex-male {
-        font-size: 1.4rem;
+        font-size: 1.4rem!important;
         color: #fff;
         background: #1b73b8;
         padding: .2rem;
@@ -255,6 +280,21 @@ export default {
         text-align: left;
         font-size: 1.6rem;
         display: flex;
+        position: relative;
+        box-shadow: 10px 10px 5px #888888;
+        .bg-music {
+          position: absolute;
+          right: 1rem;
+          .music-box {
+            transform-origin: 50% 50%;
+            animation: bgmusic 1s infinite linear;
+            display: inline-block;
+          }
+          i {
+            font-size: 4rem;
+            color: #77a4dc;
+          }
+        }
         &.isfemale {
              background: #e894bf!important;
          }
@@ -278,9 +318,17 @@ export default {
             }
         }
     }
+    @keyframes bgmusic {
+      from{
+        transform: rotate(0deg);
+      }
+      to{
+        transform: rotate(360deg);
+      }
+    }
     .dynamic-box {
         background: #ffffff;
-        margin-top: 1rem;
+        margin-top: 2rem;
         padding: 1rem 3rem;
         text-align: left;
         font-size: 1.6rem;
